@@ -10,6 +10,7 @@ import {
   ScrollView,
   FlatList,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import AppStyles from '../utils/AppStyles';
 
@@ -20,7 +21,8 @@ class HomeScreen extends React.Component {
       data: [],
       indicator: false,
       isfavorite: false,
-      selectedOptionIndex: '',
+      selectedOptionIndex: false,
+      serachFieldVisible: false,
     };
   }
 
@@ -36,13 +38,22 @@ class HomeScreen extends React.Component {
     this.setState({data: responseJson, indicator: false});
   };
 
+  searchItem = () => {
+    return (
+      <View>
+        <TextInput placeholder="Search Character.." style={styles.input} />
+      </View>
+    );
+  };
+
   // matchIndex(index, itemId) {
-  //   if (index === itemId) {
-  //     this.setState({selectedOptionIndex: index});
+  //   if (index + 1 == itemId) {
+  //     this.setState({selectedOptionIndex: true});
   //   }
   // }
 
   renderItem = (item, index) => {
+    // console.log('char ID: ', item.item.char_id);
     return (
       <View style={{margin: 13, top: 25}}>
         <TouchableOpacity
@@ -68,8 +79,7 @@ class HomeScreen extends React.Component {
           <Text style={styles.name}>{item.item.name}</Text>
           <TouchableOpacity
             onPress={() => {
-              // this.matchIndex(index, item.item.char_id - 1);
-              // this.selectItem(item)
+              // this.matchIndex(index, item.item.char_id);
               this.setState({isfavorite: !this.state.isfavorite});
             }}>
             <Image
@@ -96,7 +106,13 @@ class HomeScreen extends React.Component {
         {/* Header */}
         <View style={AppStyles.headerView}>
           <Text style={AppStyles.headingText}>The Breaking bad</Text>
-          <TouchableOpacity style={AppStyles.iconsView}>
+          <TouchableOpacity
+            style={AppStyles.iconsView}
+            onPress={() =>
+              this.setState({
+                serachFieldVisible: !this.state.serachFieldVisible,
+              })
+            }>
             <Image
               source={require('../images/search.png')}
               style={AppStyles.headerIcons}
@@ -112,6 +128,8 @@ class HomeScreen extends React.Component {
           </TouchableOpacity>
         </View>
 
+        {this.state.serachFieldVisible ? this.searchItem() : null}
+
         {/* Body */}
         {this.state.indicator ? (
           <View style={{marginTop: 300}}>
@@ -120,7 +138,7 @@ class HomeScreen extends React.Component {
         ) : (
           <FlatList
             data={this.state.data}
-            keyExtractor={item => item.char_id}
+            keyExtractor={(item, index) => item.char_id}
             numColumns={2}
             showsVerticalScrollIndicator={false}
             renderItem={(item, index) => this.renderItem(item, index)}
@@ -145,5 +163,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  input: {
+    backgroundColor: 'lightgrey',
+    color: '#0B0B0B',
+    height: 60,
   },
 });
